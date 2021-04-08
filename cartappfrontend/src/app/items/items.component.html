@@ -1,0 +1,120 @@
+<div class="container">
+    <div class="row mt-2">
+        
+        <h1>Items</h1>
+
+        <div class="col-12">
+            <div class="mt-3 mb-3">
+                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal" (click)="openModal('createItem', null)">Create item</button>
+            </div>
+        </div>
+        <div class="col-md-6" *ngFor="let item of items?.slice().reverse()">
+            <div class="card m-2" style="max-width: 540px;">
+                <div class="row g-0">
+                    <div class="col-lg-4">
+                    <img src="{{ item.imageUrl }}" class="w-100" alt="...">
+                    </div>
+                    <div class="col-lg-8">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ item.name }}</h5>
+                            <p class="card-text">{{ item.description }}</p>
+                            <p class="card-text"><small class="text-muted">Serial Number: {{ item.serialNumber }}</small></p>
+
+                            <div *ngIf="item.cartInfo; else elseBlock" class="text-success">
+                                Item assigned in <span class="text-danger"> <b> {{ item.cartInfo.name }}</b></span> cart.
+                                <a class="btn btn-primary mt-2 d-block" data-bs-toggle="modal" data-bs-target="#exampleModal" (click)="openModal('view', item.cartInfo.id)">Review Cart</a>
+                            </div>
+
+                            <ng-template #elseBlock>
+                                <span class="text-success mb-2 d-block">Item is available for checkout</span>
+                                <a class="btn btn-success d-block" data-bs-toggle="modal" data-bs-target="#exampleModal" (click)="openModal('add', item.id)">Add to Cart</a>
+                            </ng-template>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add Item to Cart</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+
+        <div *ngIf="modalAction == 'add'" class="row">
+            <div *ngFor="let cart of carts" class="col-sm-4">
+                <a class="btn btn-success mb-3 d-block" (click)="addItemToCart(cart.id)">{{ cart.name }}</a>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="close-modal">Close</button>
+            </div>
+        </div>
+
+        <div *ngIf="modalAction == 'view'" class="row">
+            <div class="col-sm-12">
+
+                <h6 class="mb-3">{{ cart?.name }}</h6>
+                
+                <ul class="list-group">
+                    <li *ngFor="let item of cartItems" class="list-group-item d-flex"> 
+                        <p class="m-auto">{{item.name}} </p>
+                        <button class="btn btn-danger" (click)="removeItemFormCart(cart.id, item.id)"><i class="bi bi-trash"></i></button>
+                    </li>
+                </ul>
+
+            </div>
+        </div>
+
+        <div *ngIf="modalAction == 'createItem'" class="row">
+
+            <form #addItem="ngForm" (ngSubmit)="createItem(addItem)">
+
+                <div class="input-group mb-3">
+                    <label class="input-group-text" for="productSelect">item</label>
+                    <select class="form-select" id="productSelect" ngModel name="name" (change)="productSelect($event)" required>
+                        <option selected>New Item</option>
+                        <option value="Backpack">Backpack</option>
+                        <option value="Shoe">Shoe</option>
+                        <option value="Glasses">Glasses</option>
+                        <option value="Cap">Cap</option>
+                        <option value="Watch">Watch</option>
+                        <option value="Lamp">Lamp</option>
+                    </select>
+                </div>
+
+                <div *ngIf="imgString">
+
+                    <img src="{{ imgString }}" class="d-block" style="max-width: 250px; transform: translateX(35%);"/>
+                    <b class="mb-2 d-block">Serial Number: #{{ serialNumber }}</b>
+
+                    <input type="text" ngModel="{{ imgString }}" name="imageUrl" class="visually-hidden" />
+                    <input type="text" ngModel="{{ serialNumber }}" name="serialNumber" class="visually-hidden" />
+
+                    <div class="form-floating">
+                        <textarea class="form-control" ngModel name="description" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px" required></textarea>
+                        <label for="floatingTextarea2">Comments</label>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary" [disabled]="addItem.invalid">Add Item</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="close-modal">Close</button>
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
